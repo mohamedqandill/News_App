@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:news_app/core/services/cache_helper/cache_helper.dart';
 import 'package:news_app/models/SourceResponse.dart';
 
 import '../../../models/news_model.dart';
@@ -12,8 +13,8 @@ class ApiManager{
 
 
     Uri url= Uri.https("newsapi.org","v2/everything",{
-      "q":sourceId,
-      "sources":q,
+      "q":q,
+      "sources":sourceId,
       "apiKey":"5e79c36d53de428bb2965242ea0a604d"
     });
 
@@ -22,7 +23,9 @@ class ApiManager{
 
     var json=jsonDecode(response.body);
 
-    return NewsModels.fromJson(json);
+    var data=await NewsModels.fromJson(json);
+    CacheHelper.saveNews(data);
+    return data;
 
   }
   
@@ -37,7 +40,9 @@ class ApiManager{
     http.Response response= await http.get(url);
 
     var json=jsonDecode(response.body);
-    return SourceResponse.fromJson(json);
+    var data =await SourceResponse.fromJson(json);
+    CacheHelper.saveSources(data);
+    return data;
   }
 
 

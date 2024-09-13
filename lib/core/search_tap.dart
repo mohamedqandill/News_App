@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:news_app/bloc/cubit.dart';
+import 'package:news_app/core/services/Apis/api_manager.dart';
 import 'package:news_app/core/widgets/news_item.dart';
 import 'package:news_app/modules/Manager/home_view_model.dart';
+import 'package:news_app/modules/screens/home/repo/remote_home_repo_imp.dart';
 
 class CustomSearch  extends SearchDelegate{
   HomeCubit? cubit;
@@ -38,20 +40,23 @@ class CustomSearch  extends SearchDelegate{
 
 
 
-    return ListView.builder(
-      itemCount: cubit?.article.length,
+    return FutureBuilder(future: ApiManager.getNews(q: query), builder: (context, snapshot) {
+      return ListView.builder(
+        itemCount: cubit?.article.length,
 
-      itemBuilder: (context, index) {
+        itemBuilder: (context, index) {
 
-        print("===========${cubit?.article}");
-        // cubit?.getNews(q: query);
-        return NewsItem(
-          article: cubit?.article[index],
-          cubit: cubit,
+          print("===========${cubit?.article}");
+          // ApiManager.getNews(q: query);
+          return NewsItem(
+            article: cubit?.article[index],
+            cubit: cubit,
 
-        );
-      },
-    );
+
+          );
+        },
+      );
+    },);
   }
 
   @override

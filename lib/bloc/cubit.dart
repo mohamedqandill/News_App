@@ -5,10 +5,14 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart'as http;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:news_app/bloc/state.dart';
 import 'package:bloc/bloc.dart';
 import 'package:news_app/models/SourceResponse.dart';
 import 'package:news_app/models/news_model.dart';
+import 'package:news_app/modules/screens/home/repo/home_repo.dart';
+import 'package:news_app/modules/screens/home/repo/local_home_repo_imp.dart';
+import 'package:news_app/modules/screens/home/repo/remote_home_repo_imp.dart';
 
 import '../models/categories_model.dart';
 
@@ -25,6 +29,7 @@ class HomeCubit extends Cubit<HomeState> {
   List<Sources> sources=[];
   List<Article> article=[];
   int selectedIndex=0;
+  late HomeRepo homeRepo;
 
 
 
@@ -49,28 +54,21 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
 
-   Future<void> getNews({String? q})async{
+   Future<void> getNews()async{
 
+     emit(getNewsLoadingState());
 
+     bool isConnected = await InternetConnectionChecker().hasConnection;
+     if(isConnected){
+       homeRepo=RemoteHomeRepoImp();
+     }
+     else{
+       homeRepo=LocalHomeRepoImp();
+     }
 
   try{
-    emit(getNewsLoadingState());
-    Uri url= Uri.https("newsapi.org","v2/everything",{
 
-      "sources":sources[selectedIndex].id,
-      "q":q,
-      "apiKey":"5e79c36d53de428bb2965242ea0a604d"
-    });
-
-
-    http.Response response=await http.get(url);
-
-    var json=jsonDecode(response.body);
-    newsModels =NewsModels.fromJson(json);
-    if(response.statusCode !=200){
-      emit(getNewsErrorState(newsModels?.message??""));
-      return;
-    }
+   newsModels = await homeRepo.getNews(sources[selectedIndex].id!);
     article =newsModels?.articles??[];
     emit(getNewsSuccesState());
   }
@@ -84,21 +82,17 @@ class HomeCubit extends Cubit<HomeState> {
 
    Future<void>getSources()async{
 
+     emit(getSourcesLoadingState());
+     bool isConnected = await InternetConnectionChecker().hasConnection;
+     if(isConnected){
+       homeRepo=RemoteHomeRepoImp();
+     }
+     else{
+       homeRepo=LocalHomeRepoImp();
+     }
   try{
-    emit(getSourcesLoadingState());
-    Uri url=Uri.https("newsapi.org","v2/top-headlines/sources",{
-      "apiKey":"5e79c36d53de428bb2965242ea0a604d",
-      "category":selectedCategory?.id??""
 
-    });
-    http.Response response= await http.get(url);
-
-    var json=jsonDecode(response.body);
-    sourceResponse=SourceResponse.fromJson(json);
-    if(response.statusCode !=200){
-      emit(getSourcesErrorState(sourceResponse?.message??""));
-      return;
-    }
+   sourceResponse= await homeRepo.getSources(selectedCategory?.id??"");
     sources= sourceResponse?.sources??[];
     emit(getSourcesSuccesState());
     getNews();

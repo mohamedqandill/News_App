@@ -150,9 +150,18 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.pop(context);
           }
           if(state is getSourcesErrorState){
-             Text(state.error);
-          }if(state is getNewsErrorState){
-             Text(state.error);
+            showDialog(context: context, builder: (context) {
+              return AlertDialog(
+                title: Text(state.error),
+              );
+            },);
+          }
+          if(state is getNewsErrorState){
+             showDialog(context: context, builder: (context) {
+               return AlertDialog(
+                 title: Text(state.error),
+               );
+             },);
           }
         },
         ),
