@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/modules/screens/home/home_screen.dart';
+import 'package:news_app/modules/screens/news_details.dart';
+import 'package:news_app/modules/screens/news_screen.dart';
 
 import 'modules/splashs/splash_screen.dart';
 
@@ -17,11 +19,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false
       ,
       title: 'Flutter Demo',
+      // home: NewsScreen(),
 
       initialRoute: SplashScreen.routeName,
       routes: {
         SplashScreen.routeName:(_)=>SplashScreen(),
         HomeScreen.routeName:(_)=>HomeScreen(),
+        NewsDetails.routeName:(_)=>NewsDetails(),
       },
 
 

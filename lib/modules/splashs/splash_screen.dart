@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/core/widgets/bg_widget/custom_bg.dart';
 import 'package:news_app/modules/screens/home/home_screen.dart';
+import 'package:news_app/modules/screens/news_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const String routeName="/";
